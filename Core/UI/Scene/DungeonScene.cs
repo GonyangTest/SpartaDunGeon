@@ -24,7 +24,7 @@ namespace SpartaDungeon.Core.UI.Scene
                 GameManager.Instance.EnterDungeon(DungeonType.Hard);
                 SceneManager.Instance.ChangeScene(SceneType.DungeonClear);
             });
-            AddMenuAction(0, MenuType.Exit, () => { SceneManager.Instance.ChangeScene(SceneType.DungeonClear); });
+            AddMenuAction(0, MenuType.Exit, () => { SceneManager.Instance.ChangeScene(SceneType.MainMenu); });
         }
 
         protected override void DisplayScene()
