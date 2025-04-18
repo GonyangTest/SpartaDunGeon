@@ -14,7 +14,7 @@ namespace SpartaDungeon.Core.Item
     };
 
     [Serializable]
-    public class BaseItem : ICloneable
+    public abstract class BaseItem : ICloneable
     {
         // 아이템 기본 정보
         [JsonProperty]
