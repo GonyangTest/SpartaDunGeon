@@ -453,7 +453,7 @@ namespace SpartaDungeon.Managers
         }
 
         /// <summary>
-        /// 휴식
+        /// 휴식하여 체력을 회복
         /// </summary>
         /// <returns>휴식 결과</returns>
         public string Rest()
@@ -462,11 +462,11 @@ namespace SpartaDungeon.Managers
             {
                 return "플레이어 정보가 없습니다.";
             }
-            if (_player.PlayerStatus.Gold < 500)
+            if (_player.PlayerStatus.Gold < Global.Rest.REST_COST)
             {
                 return "골드가 부족합니다.";
             }
-            _player.AddGold(-500);
+            _player.AddGold(-Global.Rest.REST_COST);
             _player.Recover();
             return "휴식이 완료되었습니다.";
         }

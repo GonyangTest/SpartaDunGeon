@@ -2,6 +2,7 @@ using SpartaDungeon.User;
 using System.Text.Json.Serialization;
 using System.ComponentModel;
 using SpartaDungeon.Core.Dungeon.Interface;
+using SpartaDungeon.Core.Constants;
 
 namespace SpartaDungeon.Core.Dungeon
 {
@@ -24,24 +25,21 @@ namespace SpartaDungeon.Core.Dungeon
             // 던전 난이도에 따른 추천 방어력과 보상 설정
             int recommendedDefense = 0;
             int rewardGold = 0;
-            int rewardExp = 0;
+            int rewardExp = Global.Dungeon.REWARD_EXP;
 
             switch (level)
             {
                 case DungeonType.Easy:
-                    recommendedDefense = 5;
-                    rewardGold = 1000;
-                    rewardExp = 1;
+                    recommendedDefense = Global.Dungeon.EASY_RECOMMENDED_DEFENSE;
+                    rewardGold = Global.Dungeon.EASY_REWARD_GOLD;
                     break;
                 case DungeonType.Normal:
-                    recommendedDefense = 11;
-                    rewardGold = 1700;
-                    rewardExp = 1;
+                    recommendedDefense = Global.Dungeon.NORMAL_RECOMMENDED_DEFENSE;
+                    rewardGold = Global.Dungeon.NORMAL_REWARD_GOLD;
                     break;
                 case DungeonType.Hard:
-                    recommendedDefense = 17;
-                    rewardGold = 2500;
-                    rewardExp = 1;
+                    recommendedDefense = Global.Dungeon.HARD_RECOMMENDED_DEFENSE;
+                    rewardGold = Global.Dungeon.HARD_REWARD_GOLD;
                     break;
             }
 
@@ -56,7 +54,7 @@ namespace SpartaDungeon.Core.Dungeon
             // 방어력이 추천 방어력보다 낮으면 40% 실패 확률
             if (playerDefense < recommendedDefense)
             {
-                if (Random.Shared.Next(0, 100) < 40)
+                if (Random.Shared.Next(0, 100) < Global.Dungeon.FAILURE_CHANCE)
                 {
                     isSuccess = false;
                 }
@@ -65,7 +63,7 @@ namespace SpartaDungeon.Core.Dungeon
             // 방어력이 추천 방어력보다 높을수록 피해가 줄어든다. - 추천 8 방어력 17 -> 20-9~35-9
             if(isSuccess)
             {
-                int healthDamage = Random.Shared.Next(20, 35 + 1);
+                int healthDamage = Random.Shared.Next(Global.Dungeon.MIN_DAMAGE, Global.Dungeon.MAX_DAMAGE + 1);
                 healthLost = healthDamage - (playerDefense - recommendedDefense);
                 rewardGold = (int)(rewardGold * (1 + _player.GetTotalAttack() / 100));
 
@@ -78,7 +76,7 @@ namespace SpartaDungeon.Core.Dungeon
             else
             {
                 int health = _player.GetTotalHealth();
-                healthLost = health / 2;
+                healthLost = (int)(health * Global.Dungeon.HEALTH_LOSS_ON_FAILURE);
                 _player.AddHealth(-healthLost);
             }
             

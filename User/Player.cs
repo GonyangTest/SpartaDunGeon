@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Newtonsoft.Json;
+using SpartaDungeon.Core.Constants;
 using SpartaDungeon.Core.Enums;
 using SpartaDungeon.Core.Equipment;
 using SpartaDungeon.Core.Equipment.Interface;
@@ -77,15 +78,15 @@ namespace SpartaDungeon.User
         public void Init()
         {
             _playerStatus.ClassType = ClassType.Warrior;
-            _playerStatus.Level = 1;
-            _playerStatus.Name = "스파르타 전사";
-            _playerStatus.Attack = 10;
-            _playerStatus.Defense = 5;
-            _playerStatus.MaxHealth = 100;
-            _playerStatus.Health = 100;
-            _playerStatus.Gold = 0;
-            _playerStatus.Exp = 0;
-            _playerStatus.MaxExp = 1;
+            _playerStatus.Level = Global.PlayerInitial.LEVEL;
+            _playerStatus.Name = Global.PlayerInitial.NAME;
+            _playerStatus.Attack = Global.PlayerInitial.ATTACK;
+            _playerStatus.Defense = Global.PlayerInitial.DEFENSE;
+            _playerStatus.MaxHealth = Global.PlayerInitial.MAX_HEALTH;
+            _playerStatus.Health = Global.PlayerInitial.MAX_HEALTH;
+            _playerStatus.Gold = Global.PlayerInitial.GOLD;
+            _playerStatus.Exp = Global.PlayerInitial.EXP;
+            _playerStatus.MaxExp = Global.PlayerInitial.MAX_EXP;
         }
 
         public void EquipItem(int index)
@@ -202,20 +203,22 @@ namespace SpartaDungeon.User
         public void AddExp(int exp)
         {
             _playerStatus.Exp += exp;
-
+            
             if (_playerStatus.Exp >= _playerStatus.MaxExp)
             {
-                _playerStatus.Exp -= _playerStatus.MaxExp;
                 LevelUp();
             }
         }
 
         public void LevelUp()
         {
-            _playerStatus.Level++;
-            _playerStatus.MaxExp += 1;
-            _playerStatus.Attack += 0.5f;
-            _playerStatus.Defense += 1;
+            _playerStatus.Level += 1;
+            _playerStatus.Attack += Global.LevelUp.ATTACK_INCREASE;
+            _playerStatus.Defense += Global.LevelUp.DEFENSE_INCREASE;
+            _playerStatus.MaxHealth += Global.LevelUp.MAX_HEALTH_INCREASE;
+            _playerStatus.Health = _playerStatus.MaxHealth + _playerStatus.MaxHealthBonus;
+            _playerStatus.Exp = 0;
+            _playerStatus.MaxExp = _playerStatus.Level + 1;
         }
 
         public string GetStatusAsString()
