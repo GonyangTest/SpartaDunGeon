@@ -178,7 +178,7 @@ namespace SpartaDungeon.Managers
             BaseScene? currentScene = SceneManager.Instance.GetCurrentScene();
             if (currentScene == null) return;
 
-            Console.WriteLine(Gobal.INPUT_PROMPT);
+            Console.WriteLine(Global.INPUT_PROMPT);
             string? input = Console.ReadLine();
             
             if (string.IsNullOrEmpty(input))
