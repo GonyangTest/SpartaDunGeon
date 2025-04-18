@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Folder Include="Resource\" />
+    <Folder Include="User\Interface\" />
   </ItemGroup>
 
 </Project>

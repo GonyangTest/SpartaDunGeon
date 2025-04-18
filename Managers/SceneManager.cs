@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using SpartaDungeon.Scene;
+using SpartaDungeon.Core.UI.Scene;
 
 namespace SpartaDungeon.Managers
 {

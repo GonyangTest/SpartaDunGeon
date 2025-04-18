@@ -1,18 +1,32 @@
-﻿using SpartaDungeon.Scene;
-using SpartaDungeon.Item;
-using SpartaDungeon.GamePlayer;
-using SpartaDungeon.GameDungeon;
+﻿using SpartaDungeon.Core;
+using SpartaDungeon.User;
+using SpartaDungeon.Core.Constants;
+using SpartaDungeon.Core.Data;
+using SpartaDungeon.Core.Dungeon;
+using SpartaDungeon.Core.Dungeon.Interface;
+using SpartaDungeon.Core.Item;
+using SpartaDungeon.Core.UI.Scene;
+using SpartaDungeon.Core.Equipment.Interface;
+using SpartaDungeon.Core.Inventory.Interface;
+using SpartaDungeon.Core.Shop;
+using SpartaDungeon.Core.Shop.Interface;
 
 namespace SpartaDungeon.Managers
 {
+    /// <summary>
+    /// 게임 매니저
+    /// </summary>
     public class GameManager()
     {
         public static GameManager? _Instance = null;
         private Player? _player = null;
-        private Shop? _shop = null;
+        private IItemShop? _shop = null;
         private bool _isGameRunning = false;
         BaseScene? _currentScene = null;
         DungeonResult? _dungeonResult = null;
+        
+        // DungeonManager 추가
+        private IDungeonManager? _dungeonManager = null;
 
         public static GameManager Instance
         {
@@ -40,23 +54,48 @@ namespace SpartaDungeon.Managers
             GameLoop();
         }
 
+        /// <summary>
+        /// 새로운 게임 시작
+        /// </summary>
         public void NewGame()
         {
-            _player = new Player();
-            _shop = new Shop();
+            IPlayerInventory inventory = DependencyContainer.CreateInventory();
+            IPlayerEquipmentSlot equipmentSlot = DependencyContainer.CreateEquipmentSlot();
+            
+            _player = DependencyContainer.CreatePlayer(inventory, equipmentSlot);
+            _shop = DependencyContainer.CreateShop();
 
             // 플레이어 초기화
             _player.Init();
             _shop.Init();
+            
+            if (_player != null)    
+            {
+                _dungeonManager = DependencyContainer.CreateDungeonManager(_player);
+            }
         }
 
+        /// <summary>
+        /// 게임 로드
+        /// </summary>
+        /// <returns>게임 로드 여부</returns>
         public bool LoadGame()
         {
             _player = SaveManager.instance.LoadPlayerData();
-             _shop = SaveManager.instance.LoadShopData();
+            _shop = SaveManager.instance.LoadShopData();
+            
+            if (_player != null)
+            {
+                _dungeonManager = DependencyContainer.CreateDungeonManager(_player);
+            }
+            
             return true;
         }
 
+        /// <summary>
+        /// 게임 저장
+        /// </summary>
+        /// <returns>게임 저장 여부</returns>
         public bool SaveGame()
         {
             if (_player == null || _shop == null)
@@ -70,6 +109,10 @@ namespace SpartaDungeon.Managers
             return true;    
         }
 
+        /// <summary>
+        /// 플레이어 상태 반환
+        /// </summary>
+        /// <returns>플레이어 상태</returns>
         public string GetPlayerStatus()
         {
             if(_player == null)
@@ -80,6 +123,10 @@ namespace SpartaDungeon.Managers
             return _player.GetStatusAsString();
         }
 
+        /// <summary>
+        /// 아이템 장착 해제
+        /// </summary>
+        /// <param name="itemType">아이템 타입</param>
         public void UnEquipItem(ItemType itemType)
         {
             if (_player == null)
@@ -90,6 +137,10 @@ namespace SpartaDungeon.Managers
             _player.UnEquipItem(itemType);
         }
 
+        /// <summary>
+        /// 아이템 장착
+        /// </summary>
+        /// <param name="index">아이템 인덱스</param>
         public void EquipItem(int index)
         {
             if (_player == null)
@@ -126,9 +177,12 @@ namespace SpartaDungeon.Managers
                 ProcessInput();
             }
         }
+
+        /// <summary>
+        /// 사용자 입력 처리
+        /// </summary>
         private void ProcessInput()
         {
-            // 사용자 입력 처리
             BaseScene? currentScene = SceneManager.Instance.GetCurrentScene();
             if(currentScene == null)
             {
@@ -151,11 +205,20 @@ namespace SpartaDungeon.Managers
                 currentScene.HandleInput(input);
             }
         }
+
+        /// <summary>
+        /// 플레이어 골드 반환
+        /// </summary>
+        /// <returns>플레이어 골드</returns>
         public string GetPlayerGold()
         {
             return _player.PlayerStatus.Gold.ToString();
         }
 
+        /// <summary>
+        /// 플레이어 인벤토리 아이템 반환
+        /// </summary>
+        /// <returns>플레이어 인벤토리 아이템</returns>
         public List<BaseItem> GetInventoryItmes()
         {
             if (_player == null)
@@ -166,6 +229,11 @@ namespace SpartaDungeon.Managers
             return _player.Inventory.GetItemList();
         }
 
+        /// <summary>
+        /// 플레이어 인벤토리 아이템 문자열 반환
+        /// </summary>
+        /// <param name="isEquipping">아이템 장착 여부</param>
+        /// <returns>플레이어 인벤토리 아이템 문자열</returns>
         public string GetInventoryAsString(bool isEquipping)
         {
             string result = "";
@@ -195,6 +263,10 @@ namespace SpartaDungeon.Managers
             return result;
         }
 
+        /// <summary>
+        /// 플레이어 장착 아이템 반환
+        /// </summary>
+        /// <returns>플레이어 장착 아이템</returns>
         public List<BaseItem> GetEquipmentItmes()
         {
             if (_player == null)
@@ -205,6 +277,11 @@ namespace SpartaDungeon.Managers
             return _player.EquipmentSlot.GetItemList();
         }
 
+        /// <summary>
+        /// 플레이어 장착 아이템 문자열 반환
+        /// </summary>
+        /// <param name="isEquipping">아이템 장착 여부</param>
+        /// <returns>플레이어 장착 아이템 문자열</returns>
         public string GetEquipmentAsString(bool isEquipping)
         {
             string result = "";
@@ -234,6 +311,10 @@ namespace SpartaDungeon.Managers
             return result;
         }
 
+        /// <summary>
+        /// 상점 아이템 반환
+        /// </summary>
+        /// <returns>상점 아이템</returns>
         public List<BaseItem> GetShopItems()
         {
             if (_shop == null)
@@ -244,6 +325,11 @@ namespace SpartaDungeon.Managers
             return _shop.GetShopItemList();
         }
 
+        /// <summary>
+        /// 상점 아이템 문자열 반환
+        /// </summary>
+        /// <param name="isBuying">구매 여부</param>
+        /// <returns>상점 아이템 문자열</returns>
         public string GetShopItemsAsString(bool isBuying)
         {
             string result = "";
@@ -282,6 +368,11 @@ namespace SpartaDungeon.Managers
             return result;
         }
 
+        /// <summary>
+        /// 아이템 구매
+        /// </summary>
+        /// <param name="index">상점 아이템 목록 인덱스</param>
+        /// <returns>아이템 구매 결과</returns>
         public string BuyItem(int index)
         {
             if (_shop == null || _player == null)
@@ -311,6 +402,13 @@ namespace SpartaDungeon.Managers
             return "구매를 완료했습니다.";
         }
 
+        /// <summary>
+        /// 아이템 판매
+        /// </summary>
+        /// <param name="index">인벤토리 목록 인덱스</param>
+        /// <param name="item">아이템</param>
+        /// <param name="isEquipped">아이템 장착 여부</param>
+        /// <returns>아이템 판매 결과</returns>
         public string SellItem(int index, BaseItem item, bool isEquipped)
         {
             if (_shop == null || _player == null)
@@ -340,6 +438,10 @@ namespace SpartaDungeon.Managers
             return "판매를 완료했습니다.";
         }
 
+        /// <summary>
+        /// 휴식
+        /// </summary>
+        /// <returns>휴식 결과</returns>
         public string Rest()
         {
             if (_player == null)
@@ -355,33 +457,23 @@ namespace SpartaDungeon.Managers
             return "휴식이 완료되었습니다.";
         }
 
+        /// <summary>
+        /// 던전 입장
+        /// </summary>
+        /// <param name="level">던전 난이도</param>
         public void EnterDungeon(DungeonType level)
         {
-            if(_player == null)
+            if(_player == null || _dungeonManager == null)
             {
                 Console.WriteLine("플레이어 정보가 없습니다.");
                 return;
             }
 
-            Dungeon dungeon = new Dungeon(level);
-            DungeonResult result = dungeon.Enter(_player);
-            if (result.isClear == false)
-            {
-                _player.AddHealth(-result.HealthLost);
-                if (_player.PlayerStatus.Health <= 0)
-                {
-                    Console.WriteLine("플레이어가 사망했습니다.");
-                    _isGameRunning = false;
-                }
-            }
-            else
-            {
-                _player.AddHealth(-result.HealthLost);
-                _player.AddGold(result.reward);
-                _player.AddExp(1);
-                Console.WriteLine($"던전 클리어 보상: {result.reward} G");
-            }
-            _dungeonResult = result;
+            // DungeonManager를 사용하여 던전 입장
+            _dungeonManager.EnterDungeon(level);
+            
+            // 던전 결과 저장
+            _dungeonResult = _dungeonManager.GetDungeonResult();
         }
 
         private void LoadScene()

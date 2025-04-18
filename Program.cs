@@ -1,21 +1,47 @@
 ﻿using System.Text;
-using SpartaDungeon.Item;
+using SpartaDungeon.Core.Data;
+using SpartaDungeon.Core.Dungeon;
+using SpartaDungeon.Core.Dungeon.Interface;
+using SpartaDungeon.Core.Equipment;
+using SpartaDungeon.Core.Equipment.Interface;
+using SpartaDungeon.Core.Inventory;
+using SpartaDungeon.Core.Inventory.Interface;
+using SpartaDungeon.Core.Shop;
+using SpartaDungeon.Core.Shop.Interface;
 using SpartaDungeon.Managers;
+using SpartaDungeon.User;
+
 namespace SpartaDungeon
 {
-
     public class DependencyContainer
-    {
-        // 간단한 예시 - 실제로는 더 복잡한 DI 컨테이너를 사용할 수 있음
-        public static GameManager CreateGameManager()
+    {        public static GameManager CreateGameManager()
         {
-            // IPlayerService playerService = new PlayerService();
-            // IShopService shopService = new ShopService();
-            // ISaveService saveService = new SaveService();
-            // ISceneService sceneService = new SceneService();
-            
-            // return new GameManager(playerService, shopService, saveService, sceneService);
-             return new GameManager();
+            return new GameManager();
+        }
+        
+        public static IPlayerInventory CreateInventory()
+        {
+            return new PlayerInventory();
+        }
+        
+        public static IPlayerEquipmentSlot CreateEquipmentSlot() 
+        {
+            return new PlayerEquipmentSlot();
+        }
+        
+        public static Player CreatePlayer(IPlayerInventory inventory, IPlayerEquipmentSlot equipmentSlot)
+        {
+            return new Player(inventory, equipmentSlot);
+        }
+        
+        public static IDungeonManager CreateDungeonManager(Player player)
+        {
+            return new DungeonManager(player);
+        }
+        
+        public static IItemShop CreateShop()
+        {
+            return new ItemShop();
         }
     }
 

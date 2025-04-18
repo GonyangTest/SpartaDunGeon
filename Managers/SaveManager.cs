@@ -1,7 +1,11 @@
 ﻿using System.ComponentModel;
 using System.Numerics;
 using System.Text.Json;
-using SpartaDungeon.GamePlayer;
+using SpartaDungeon.Core.Equipment.Interface;
+using SpartaDungeon.Core.Inventory.Interface;
+using SpartaDungeon.Core.Shop;
+using SpartaDungeon.Core.Shop.Interface;
+using SpartaDungeon.User;
 
 namespace SpartaDungeon.Managers
 {
@@ -28,7 +32,7 @@ namespace SpartaDungeon.Managers
             File.WriteAllText(path, json);
         }
 
-        public void SaveShopData(Shop shop)
+        public void SaveShopData(IItemShop shop)
         {
             // Save shop data to file
             string path = "shop.json";
@@ -38,24 +42,28 @@ namespace SpartaDungeon.Managers
 
         public Player? LoadPlayerData()
         {
+            // 팩토리 메서드로 의존성 생성
+            IPlayerInventory inventory = DependencyContainer.CreateInventory();
+            IPlayerEquipmentSlot equipmentSlot = DependencyContainer.CreateEquipmentSlot();
+            
             // Load player data from file
             string path = "playerData.json";
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);
-                Player? player = JsonSerializer.Deserialize<Player>(json);
+                Player? player = JsonSerializer.Deserialize<Player>(json);       
                 return player;
             }
             return null;
         }
-        public Shop? LoadShopData()
+        public IItemShop? LoadShopData()
         {
-            // Load player shop from file
+            // 상점 데이터 로드
             string path = "shop.json";
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);
-                Shop? shop = JsonSerializer.Deserialize<Shop>(json);
+                IItemShop? shop = JsonSerializer.Deserialize<ItemShop>(json);
                 return shop;
             }
             return null;
