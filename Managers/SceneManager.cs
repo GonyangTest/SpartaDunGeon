@@ -47,6 +47,22 @@ namespace SpartaDungeon.Managers
             }
         }
 
+        public void LoadAllScene()
+        {
+            AddScene(SceneType.Intro, new IntroScene());
+            AddScene(SceneType.MainMenu, new MainScene());
+            AddScene(SceneType.Shop, new ShopScene());
+            AddScene(SceneType.Inventory, new InventoryScene());
+            AddScene(SceneType.Equipment, new EquipmentScene());
+            AddScene(SceneType.Status, new StatusScene());
+            AddScene(SceneType.Buy, new BuyScene());
+            AddScene(SceneType.Sell, new SellScene());
+            AddScene(SceneType.Dungeon, new DungeonScene());
+            AddScene(SceneType.Rest, new RestScene());
+            AddScene(SceneType.DungeonClear, new DungeonClearScene());
+            
+        }
+
         public void AddScene(SceneType type, BaseScene scene)
         {
             if (!_sceneDictionary.ContainsKey(type))

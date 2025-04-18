@@ -495,17 +495,7 @@ namespace SpartaDungeon.Managers
         /// </summary>
         private void LoadScene()
         {
-            SceneManager.Instance.AddScene(SceneType.Intro, new IntroScene());
-            SceneManager.Instance.AddScene(SceneType.MainMenu, new MainScene());
-            SceneManager.Instance.AddScene(SceneType.Shop, new ShopScene());
-            SceneManager.Instance.AddScene(SceneType.Inventory, new InventoryScene());
-            SceneManager.Instance.AddScene(SceneType.Equipment, new EquipmentScene());
-            SceneManager.Instance.AddScene(SceneType.Status, new StatusScene());
-            SceneManager.Instance.AddScene(SceneType.Buy, new BuyScene());
-            SceneManager.Instance.AddScene(SceneType.Sell, new SellScene());
-            SceneManager.Instance.AddScene(SceneType.Dungeon, new DungeonScene());
-            SceneManager.Instance.AddScene(SceneType.Rest, new RestScene());
-            SceneManager.Instance.AddScene(SceneType.DungeonClear, new DungeonClearScene());
+            SceneManager.Instance.LoadAllScene();
         }
     }
 }
