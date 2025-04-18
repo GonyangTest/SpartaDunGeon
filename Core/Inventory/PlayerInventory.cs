@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 using SpartaDungeon.Core.Item;
 
 namespace SpartaDungeon.Core.Inventory
@@ -7,11 +7,11 @@ namespace SpartaDungeon.Core.Inventory
     [Serializable]
     public class PlayerInventory : Interface.IPlayerInventory
     {
-        [JsonInclude]
+        [JsonProperty]
         private BaseItem[] _inventory;
-        [JsonInclude]
+        [JsonProperty]
         private int _inventorySize;
-        [JsonInclude]
+        [JsonProperty]
         private const int kmaxInventorySize = 30;
 
         public PlayerInventory()

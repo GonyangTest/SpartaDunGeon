@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Numerics;
-using System.Text.Json;
+using Newtonsoft.Json;
 using SpartaDungeon.Core.Equipment.Interface;
 using SpartaDungeon.Core.Inventory.Interface;
 using SpartaDungeon.Core.Shop;
@@ -28,7 +28,11 @@ namespace SpartaDungeon.Managers
         {
             // Save player data to file
             string path = "playerData.json";
-            string json = JsonSerializer.Serialize(player);
+            string json = JsonConvert.SerializeObject(player, Formatting.Indented, 
+                new JsonSerializerSettings { 
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
             File.WriteAllText(path, json);
         }
 
@@ -36,7 +40,11 @@ namespace SpartaDungeon.Managers
         {
             // Save shop data to file
             string path = "shop.json";
-            string json = JsonSerializer.Serialize(shop);
+            string json = JsonConvert.SerializeObject(shop, Formatting.Indented, 
+                new JsonSerializerSettings { 
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
             File.WriteAllText(path, json);
         }
 
@@ -51,11 +59,16 @@ namespace SpartaDungeon.Managers
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);
-                Player? player = JsonSerializer.Deserialize<Player>(json);       
+                Player? player = JsonConvert.DeserializeObject<Player>(json, 
+                    new JsonSerializerSettings { 
+                        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        TypeNameHandling = TypeNameHandling.Auto
+                    });       
                 return player;
             }
             return null;
         }
+        
         public IItemShop? LoadShopData()
         {
             // 상점 데이터 로드
@@ -63,7 +76,11 @@ namespace SpartaDungeon.Managers
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);
-                IItemShop? shop = JsonSerializer.Deserialize<ItemShop>(json);
+                IItemShop? shop = JsonConvert.DeserializeObject<ItemShop>(json, 
+                    new JsonSerializerSettings { 
+                        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        TypeNameHandling = TypeNameHandling.Auto
+                    });
                 return shop;
             }
             return null;

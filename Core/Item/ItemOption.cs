@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Numerics;
 using System.Text;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using SpartaDungeon.Core;
 using SpartaDungeon.Core.Enums;
 using SpartaDungeon.Core.Utils;
@@ -24,7 +24,7 @@ namespace SpartaDungeon.Core.Item
             return clone;
         }
 
-        [JsonInclude]
+        [JsonProperty]
         private List<ItemOption> _itemOptions = new List<ItemOption>(); // 아이템 옵션 리스트
         public ItemOptions() { }
 
@@ -72,9 +72,9 @@ namespace SpartaDungeon.Core.Item
     [Serializable]
     public class ItemOption
     {
-        [JsonInclude]
+        [JsonProperty]
         public ItemOptionType Type { get; private set; }
-        [JsonInclude]
+        [JsonProperty]
         public float Value { get; private set; }
 
         public ItemOption(ItemOptionType type, float value)

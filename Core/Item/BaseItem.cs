@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace SpartaDungeon.Core.Item
 {
     [Serializable]
+    [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public enum ItemType
     {
         Weapon,
@@ -16,25 +17,25 @@ namespace SpartaDungeon.Core.Item
     public class BaseItem : ICloneable
     {
         // 아이템 기본 정보
-        [JsonInclude]
+        [JsonProperty]
         protected int _id;
-        [JsonInclude]
+        [JsonProperty]
         protected string _name;
-        [JsonInclude]
+        [JsonProperty]
         protected string _description;
-        [JsonInclude]
+        [JsonProperty]
         protected int _price;
-        [JsonInclude]
+        [JsonProperty]
         protected int _isEquippable;
-        [JsonInclude]
+        [JsonProperty]
         protected ItemType _itemType;
-        [JsonInclude]
+        [JsonProperty]
         protected ItemOptions _options;
 
         // 옵션
-        [JsonInclude]
+        [JsonProperty]
         protected int _power;
-        [JsonInclude]
+        [JsonProperty]
         protected int _defense;
 
         public int Id { get { return _id; } set { _id = value; } }

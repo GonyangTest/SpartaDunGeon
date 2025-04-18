@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using SpartaDungeon.Core.Enums;
 using SpartaDungeon.Core.Equipment;
 using SpartaDungeon.Core.Equipment.Interface;
@@ -13,41 +13,41 @@ namespace SpartaDungeon.User
     [Serializable]
     public struct PlayerStatus
     {
-        [JsonInclude]
+        [JsonProperty]
         public ClassType ClassType;
-        [JsonInclude]
+        [JsonProperty]
         public int Level;
-        [JsonInclude]
+        [JsonProperty]
         public string Name;
-        [JsonInclude]
+        [JsonProperty]
         public float Attack;
-        [JsonInclude]
+        [JsonProperty]
         public int AttackBonus;
-        [JsonInclude]
+        [JsonProperty]
         public int Defense;
-        [JsonInclude]
+        [JsonProperty]
         public int DefenseBonus;
-        [JsonInclude]
+        [JsonProperty]
         public int MaxHealth;
-        [JsonInclude]
+        [JsonProperty]
         public int Health;
-        [JsonInclude]
+        [JsonProperty]
         public int MaxHealthBonus;
-        [JsonInclude]
+        [JsonProperty]
         public int Gold;
-        [JsonInclude]
+        [JsonProperty]
         public int Exp;
-        [JsonInclude]
+        [JsonProperty]
         public int MaxExp;
     }
     [Serializable]
     public class Player
     {
-        [JsonInclude]
+        [JsonProperty]
         private PlayerStatus _playerStatus;
-        [JsonInclude]
+        [JsonProperty]
         private IPlayerInventory _inventory;
-        [JsonInclude]
+        [JsonProperty]
         private IPlayerEquipmentSlot _equipmentSlot;
 
         public PlayerStatus PlayerStatus
@@ -67,11 +67,6 @@ namespace SpartaDungeon.User
             set { _equipmentSlot = value; }
         }
 
-        public Player()
-        {
-            _inventory = new PlayerInventory();
-            _equipmentSlot = new PlayerEquipmentSlot();
-        }
 
         public Player(IPlayerInventory inventory, IPlayerEquipmentSlot equipmentSlot)
         {

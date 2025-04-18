@@ -3,16 +3,16 @@ using SpartaDungeon.Core.Item;
 using SpartaDungeon.Core.Shop.Interface;
 using System.ComponentModel;
 using System.Reflection;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace SpartaDungeon.Core.Shop
 {
     [Serializable]
     public class ItemShop : IItemShop
     {
-        [JsonInclude]
+        [JsonProperty]
         public Dictionary<int, BaseItem> _items = new Dictionary<int, BaseItem>();
-        [JsonInclude]
+        [JsonProperty]
         public Dictionary<int, int> _itemCount = new Dictionary<int, int>();
 
         public ItemShop()

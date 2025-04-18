@@ -3,6 +3,7 @@ using System.Dynamic;
 using System.Text.Json.Serialization;
 using SpartaDungeon.Core.Equipment.Interface;
 using SpartaDungeon.Core.Item;
+using Newtonsoft.Json;
 
 namespace SpartaDungeon.Core.Equipment
 {
@@ -10,7 +11,7 @@ namespace SpartaDungeon.Core.Equipment
     [Serializable]
     public class PlayerEquipmentSlot : IPlayerEquipmentSlot
     {
-        [JsonInclude]
+        [JsonProperty]
         private Dictionary<ItemType, BaseItem?> _equipmentSlots;
 
         public PlayerEquipmentSlot()
