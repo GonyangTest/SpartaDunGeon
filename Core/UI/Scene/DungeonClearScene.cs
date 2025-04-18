@@ -21,6 +21,12 @@ namespace SpartaDungeon.Core.UI.Scene
         protected override void DisplayScene()
         {
             DungeonResult? result = GameManager.Instance.DungeonResult;
+            if(result == null)
+            {
+                Console.WriteLine("던전 결과가 없습니다.");
+                return;
+            }
+
             Console.Clear();
             string description;
 

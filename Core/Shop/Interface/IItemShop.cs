@@ -8,7 +8,7 @@ namespace SpartaDungeon.Core.Shop.Interface
         BaseItem GetShopItem(int id);
         List<BaseItem> GetShopItemList();
         int GetItemIndex(BaseItem item);
-        BaseItem GetItem(int index);
+        BaseItem? GetItem(int index);
         bool HasStock(int index);
         void DecreaseStock(int index);
         void IncreaseStock(int index);

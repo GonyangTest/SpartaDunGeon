@@ -71,7 +71,7 @@ namespace SpartaDungeon.Core.Shop
             return -1;
         }
 
-        public BaseItem GetItem(int index)
+        public BaseItem? GetItem(int index)
         {
             if (_items.ContainsKey(index))
             {

@@ -10,13 +10,14 @@ using SpartaDungeon.Core.Equipment.Interface;
 using SpartaDungeon.Core.Inventory.Interface;
 using SpartaDungeon.Core.Shop;
 using SpartaDungeon.Core.Shop.Interface;
+using System.Text;
 
 namespace SpartaDungeon.Managers
 {
     /// <summary>
     /// 게임 매니저
     /// </summary>
-    public class GameManager()
+    public class GameManager
     {
         public static GameManager? _Instance = null;
         private Player? _player = null;
@@ -69,16 +70,13 @@ namespace SpartaDungeon.Managers
             _player.Init();
             _shop.Init();
             
-            if (_player != null)    
-            {
-                _dungeonManager = DependencyContainer.CreateDungeonManager(_player);
-            }
+            _dungeonManager = DependencyContainer.CreateDungeonManager(_player);
         }
 
         /// <summary>
         /// 게임 로드
         /// </summary>
-        /// <returns>게임 로드 여부</returns>
+        /// <returns>게임 로드 성공 여부</returns>
         public bool LoadGame()
         {
             _player = SaveManager.instance.LoadPlayerData();
@@ -87,15 +85,16 @@ namespace SpartaDungeon.Managers
             if (_player != null)
             {
                 _dungeonManager = DependencyContainer.CreateDungeonManager(_player);
+                return _shop != null;
             }
             
-            return true;
+            return false;
         }
 
         /// <summary>
         /// 게임 저장
         /// </summary>
-        /// <returns>게임 저장 여부</returns>
+        /// <returns>게임 저장 성공 여부</returns>
         public bool SaveGame()
         {
             if (_player == null || _shop == null)
@@ -112,12 +111,13 @@ namespace SpartaDungeon.Managers
         /// <summary>
         /// 플레이어 상태 반환
         /// </summary>
-        /// <returns>플레이어 상태</returns>
+        /// <returns>플레이어 상태 문자열</returns>
         public string GetPlayerStatus()
         {
             if(_player == null)
             {
                 Console.WriteLine("플레이어 정보가 없습니다.");
+                return "";
             }
 
             return _player.GetStatusAsString();
@@ -129,12 +129,7 @@ namespace SpartaDungeon.Managers
         /// <param name="itemType">아이템 타입</param>
         public void UnEquipItem(ItemType itemType)
         {
-            if (_player == null)
-            {
-                Console.WriteLine("플레이어 정보가 없습니다.");
-                return;
-            }
-            _player.UnEquipItem(itemType);
+            _player?.UnEquipItem(itemType);
         }
 
         /// <summary>
@@ -143,14 +138,12 @@ namespace SpartaDungeon.Managers
         /// <param name="index">아이템 인덱스</param>
         public void EquipItem(int index)
         {
-            if (_player == null)
-            {
-                Console.WriteLine("플레이어 정보가 없습니다.");
-                return;
-            }
-            _player.EquipItem(index);
+            _player?.EquipItem(index);
         }
 
+        /// <summary>
+        /// 게임 메인 루프
+        /// </summary>
         private void GameLoop()
         {
             _isGameRunning = true;
@@ -162,7 +155,6 @@ namespace SpartaDungeon.Managers
                 BaseScene? newScene = SceneManager.Instance.GetCurrentScene();
                 if (newScene == null)
                 {
-                    Console.WriteLine("현재 씬이 없습니다.");
                     _isGameRunning = false;
                     return;
                 }
@@ -184,14 +176,11 @@ namespace SpartaDungeon.Managers
         private void ProcessInput()
         {
             BaseScene? currentScene = SceneManager.Instance.GetCurrentScene();
-            if(currentScene == null)
-            {
-                Console.WriteLine("현재 씬이 없습니다.");
-                return;
-            }
+            if (currentScene == null) return;
 
             Console.WriteLine(Gobal.INPUT_PROMPT);
             string? input = Console.ReadLine();
+            
             if (string.IsNullOrEmpty(input))
             {
                 currentScene.Update();
@@ -200,10 +189,7 @@ namespace SpartaDungeon.Managers
             }
 
             // 현재 씬에 입력 전달
-            if (currentScene != null)
-            {
-                currentScene.HandleInput(input);
-            }
+            currentScene.HandleInput(input);
         }
 
         /// <summary>
@@ -212,6 +198,11 @@ namespace SpartaDungeon.Managers
         /// <returns>플레이어 골드</returns>
         public string GetPlayerGold()
         {
+            if (_player == null)
+            {
+                Console.WriteLine("플레이어 정보가 없습니다.");
+                return "0";
+            }
             return _player.PlayerStatus.Gold.ToString();
         }
 
@@ -236,31 +227,38 @@ namespace SpartaDungeon.Managers
         /// <returns>플레이어 인벤토리 아이템 문자열</returns>
         public string GetInventoryAsString(bool isEquipping)
         {
-            string result = "";
-            
             if(_player == null)
             {
                 Console.WriteLine("플레이어 정보가 없습니다.");
-                return result;
+                return "";
             }
+            
             List<BaseItem> items = _player.Inventory.GetItemList();
+            if (items.Count == 0)
+            {
+                return "";
+            }
+            
+            StringBuilder sb = new StringBuilder();
+            
             for (int i = 0; i < items.Count; i++)
             {
-                string line = "";
-                line += "- ";
+                sb.Append("- ");
+                
                 if (isEquipping == true)
                 {
-                    line += $"{i + 1 + _player.EquipmentSlot.GetItemCount()}. ";
+                    sb.Append($"{i + 1 + _player.EquipmentSlot.GetItemCount()}. ");
                 }
 
-                line += $"{items[i].ToString()}";
+                sb.Append($"{items[i].ToString()}");
+                
                 if (i != items.Count - 1)
                 {
-                    line += "\n";
+                    sb.Append("\n");
                 }
-                result += line;
             }
-            return result;
+            
+            return sb.ToString();
         }
 
         /// <summary>
@@ -284,31 +282,38 @@ namespace SpartaDungeon.Managers
         /// <returns>플레이어 장착 아이템 문자열</returns>
         public string GetEquipmentAsString(bool isEquipping)
         {
-            string result = "";
-
             if (_player == null)
             {
                 Console.WriteLine("플레이어 정보가 없습니다.");
-                return result;
+                return "";
             }
+            
             List<BaseItem> items = _player.EquipmentSlot.GetItemList();
+            if (items.Count == 0)
+            {
+                return "";
+            }
+            
+            StringBuilder sb = new StringBuilder();
+            
             for (int i = 0; i < items.Count; i++)
             {
-                string line = "";
-                line += "- ";
+                sb.Append("- ");
+                
                 if (isEquipping == true)
                 {
-                    line += $"{i + 1}. ";
+                    sb.Append($"{i + 1}. ");
                 }
 
-                line += $"[E]{items[i].ToString()}";
+                sb.Append($"[E]{items[i].ToString()}");
+                
                 if(i != items.Count - 1)
                 {
-                    line += "\n";
+                    sb.Append("\n");
                 }
-                result += line;
             }
-            return result;
+            
+            return sb.ToString();
         }
 
         /// <summary>
@@ -332,40 +337,45 @@ namespace SpartaDungeon.Managers
         /// <returns>상점 아이템 문자열</returns>
         public string GetShopItemsAsString(bool isBuying)
         {
-            string result = "";
-
             if (_shop == null)
             {
                 Console.WriteLine("상점 정보가 없습니다.");
-                return result;
+                return "";
             }
+            
             List<BaseItem> items = _shop.GetShopItemList();
+            if (items.Count == 0)
+            {
+                return "";
+            }
+            
+            StringBuilder sb = new StringBuilder();
+            
             for (int i = 0; i < items.Count; i++)
             {
-                string line = "";
-                line += "- ";
+                sb.Append("- ");
+                
                 if (isBuying == true)
                 {
-                    line += $"{i + 1}. ";
+                    sb.Append($"{i + 1}. ");
                 }
 
                 if (_shop.HasStock(i) == false)
                 {
-
-
-                    line += $"{items[i].ToString()} | 구매완료";
+                    sb.Append($"{items[i].ToString()} | 구매완료");
                 }
                 else
                 {
-                    line += $"{items[i].ToString()} | {items[i].Price}";
+                    sb.Append($"{items[i].ToString()} | {items[i].Price}");
                 }
+                
                 if (i != items.Count - 1)
                 {
-                    line += "\n";
+                    sb.Append("\n");
                 }
-                result += line;
             }
-            return result;
+            
+            return sb.ToString();
         }
 
         /// <summary>
@@ -383,7 +393,11 @@ namespace SpartaDungeon.Managers
 
             if(_shop.HasStock(index))
             {
-                BaseItem item = _shop.GetItem(index);
+                BaseItem? item = _shop.GetItem(index);
+                if(item == null)
+                {
+                    return "잘못된 인덱스입니다.";
+                }
                 BaseItem clone = ItemDataBase.Instance.CreateItem(item.Id);
                 if (_player.BuyItem(clone))
                 {
@@ -476,6 +490,9 @@ namespace SpartaDungeon.Managers
             _dungeonResult = _dungeonManager.GetDungeonResult();
         }
 
+        /// <summary>
+        /// 씬 로드 및 등록
+        /// </summary>
         private void LoadScene()
         {
             SceneManager.Instance.AddScene(SceneType.Intro, new IntroScene());
